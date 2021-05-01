@@ -17,7 +17,7 @@ const mouse = require('./mouse-follower.js')(emitter)
 const countdown = require('./lib/countdown.js')
 const state = { width: window.innerWidth, height: window.innerHeight}
 
-agua.load()
+
 initHydra({ emitter: emitter }, state)
 initPixi({ emitter: emitter }, state)
 // create ui elements
@@ -71,6 +71,7 @@ window.addEventListener("message", function(event) {
 })
 
 function start() {
+  agua.load()
   uiContainer.innerHTML = ''
   uiContainer.appendChild(editor)
   emitter.emit('start')

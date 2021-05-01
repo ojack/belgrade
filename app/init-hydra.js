@@ -1,7 +1,7 @@
 const html = require('nanohtml')
 
 module.exports = ({ emitter }, state) => {
-  const canvas = html`<canvas class="w-100 h-100 absolute top-0 left-0" style="image-rendering:pixelated"></canvas>`
+  const canvas = html`<canvas class="w-100 h-100 absolute top-0 left-0" style=""></canvas>`
   canvas.width = state.width
   canvas.height = state.height
   document.body.appendChild(canvas)
@@ -9,7 +9,7 @@ module.exports = ({ emitter }, state) => {
    detectAudio: false, canvas: canvas
   })
 
-  speed = 0.5
+  //speed = 0.5
 
 
 
@@ -30,27 +30,38 @@ speed = 0.1
 //
 // render(o1)
 //
-// emitter.on('start', () => {
-  //src(o0).scrollX([0, -0.001, 0, 0.001].ease('sin')).scrollY([-0.001, 0, 0.001, 0].ease('sin')).layer(s2).out(o0)
 
 
-//})
 
+window.color = () => osc(3.5, 1, 1.2).color(0.4, 0.4, 1.2)
+  .add(osc(1.4, -0.4, 1.3).color(1, -0.5, 0.8))
 
-window.color = () => osc(5, 1, 1.2).color(0.4, 0.4, 1.2)
-  .add(osc(2, -0.4, 1.3).color(1, -0.5, 0.8))
-
-window.celeste = (scale = 0.9, x = 0, y= 0) => src(s1).contrast(1.4)
+window.olivia = (scale = 0.9, x = 0, y= 0) => src(s1).contrast(1.4)
 .mult(window.color())
 .mask(shape(4, scale, 0))
 .scale(0.7)
 .scroll(x, y)
 
-window.olivia = (scale = 0.9, x = 0, y= 0) => src(s0).contrast(1.4)
+window.celeste = (scale = 0.9, x = 0, y= 0) => src(s0).contrast(1.05)
 .mult(window.color())
 .mask(shape(4, scale, 0))
 .scale(0.7)
 .scroll(x, y)
+
+window.clear = () => solid(0, 0, 0, 0)
+
+emitter.on('start', () => {
+//  src(o0).scrollX([0, -0.001, 0, 0.001].ease('sin')).scrollY([-0.001, 0, 0.001, 0].ease('sin')).layer(s2).out(o0)
+
+  window.Mouse({ scale: 0.15 })
+
+  window.clear().out(o2)
+
+  setTimeout( () => {
+    color().layer(o2).out()
+    src(o2).blend(clear(), 0.025).layer(s2).out(o2)
+  }, 200 )
+})
 
 src(o2).layer(src(s2)).out(o2)
 //src(o2).out(o0)
