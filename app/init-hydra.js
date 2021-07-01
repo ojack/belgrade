@@ -6,8 +6,11 @@ module.exports = ({ emitter }, state) => {
   canvas.height = state.height
   document.body.appendChild(canvas)
   const hydra = new Hydra({
-   detectAudio: false, canvas: canvas
+  // detectAudio: false,
+   canvas: canvas
   })
+
+  window.hydra = hydra
 
   //speed = 0.5
 
@@ -15,7 +18,7 @@ module.exports = ({ emitter }, state) => {
 
 
 // // unfoldings
-speed = 0.1
+// speed = 0.1
 // osc(10, 0.03, 1.2).color(1.0, 0.3, 0.6)
 //   .add(osc(15, -0.1).color(0.1, 0.9, 0.3))
 //   .layer(s2)
@@ -33,8 +36,8 @@ speed = 0.1
 
 
 
-window.color = () => osc(3.5, 1, 1.2).color(0.4, 0.4, 1.2)
-  .add(osc(1.4, -0.4, 1.3).color(1, -0.5, 0.8))
+window.color = () => osc(3.5, 0.1, 1.2).color(0.4, 0.04, 1.2)
+  .add(osc(1.4, -0.04, 1.3).color(1, -0.5, 0.8))
 
 window.olivia = (scale = 0.9, x = 0, y= 0) => src(s1).contrast(1.4)
 .mult(window.color())
@@ -48,12 +51,13 @@ window.celeste = (scale = 0.9, x = 0, y= 0) => src(s0).contrast(1.05)
 .scale(0.7)
 .scroll(x, y)
 
+
 window.clear = () => solid(0, 0, 0, 0)
 
 emitter.on('start', () => {
 //  src(o0).scrollX([0, -0.001, 0, 0.001].ease('sin')).scrollY([-0.001, 0, 0.001, 0].ease('sin')).layer(s2).out(o0)
 
-  window.Mouse({ scale: 0.15 })
+//  window.Mouse({ scale: 0.15 })
 
   window.clear().out(o2)
 
@@ -69,6 +73,8 @@ window.color().add(o2, 0.5).out()
   render(o0)
 
 window.addEventListener('resize', () => {
+  window.width = window.innerWidth
+  window.height = window.innerHeight
 //  console.log('resizing')
 //  setResolution(window.innerWidth, window.innerHeight)
 })

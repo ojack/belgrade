@@ -1,41 +1,53 @@
 const initStreamingMedia = require('./init-media-sources.js')
 const initHydra = require('./init-hydra.js')
 const html = require('nanohtml')
-const initPixi = require('./pixi.js')
-const agua = require('./agua.js')
+const { nanoid } = require('nanoid')
+
+// const initPixi = require('./pixi.js')
+// const agua = require('./agua.js')
 const EventEmitter = require('events')
 
-const flokURL = "https://flok.clic.cf/s/NjUxMWM2MjUtOTFlZi00NzNiLWJhNTUtMzVhNWIwY2U0MmFm?layout=hydra,hydra&noHydra=1&bgOpacity=0"
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const edit = urlParams.get('edit')
+
+const session = urlParams.get('session')
+const sessionId = session ? session : nanoid()
+
+urlParams.set('session', sessionId);
+
+
+// const flokURL = "https://flok.clic.cf/s/NjUxMWM2MjUtOTFlZi00NzNiLWJhNTUtMzVhNWIwY2U0MmFm?layout=hydra,hydr&noHydra=1&bgOpacity=0"
+
+console.log('joining', sessionId)
+
+const flokURL = `https://flok.clic.cf/s/${sessionId}?layout=hydra&noHydra=1&bgOpacity=0`
+
+
 const readOnly = edit == 1 ? false : true
 
 const emitter = new EventEmitter()
-const mouse = require('./mouse-follower.js')(emitter)
+//const mouse = require('./mouse-follower.js')(emitter)
 const countdown = require('./lib/countdown.js')
 const state = { width: window.innerWidth, height: window.innerHeight}
 
 
 initHydra({ emitter: emitter }, state)
-initPixi({ emitter: emitter }, state)
+// initPixi({ emitter: emitter }, state)
 // create ui elements
-const intro = html`<div class="pa4 i f2"> <h1 class="f1 i"> flujos </h1>
-    <p class=""> live website performance <br> by Celeste Betancur and Olivia Jack</p>
-    <p class=""> part of <a class="black ul dim" href="https://oscillation-festival.be/#about" target="_blank">Oscillation Festival</a> </p>
-    May 1, 2021 @ 11:30pm Brussels / 4:30pm Medellín / 2:30pm San Francisco
-      <div class="white">${countdown()}</div>
+const intro = html`<div class="pa4 i f2">
+
     <div onclick=${start} class="mt5 ph4 bg-black white br-pill pointer dim dib pa2"> ${">>>"} enter ${"<<<<"} </div>
 
 
   </div>`
 
 const uiContainer = html`<div class="w-100 h-100 absolute top-0 left-0 overflow-y-auto flex items-center justify-center">${intro}</div>`
-
+const logEl = html`<div class="w-100 courier absolute bottom-0 left-0 red"></div>`
 const iframe = html`<iframe src="${flokURL}${readOnly?'&readonly=1':''}" frameborder="0" class="w-100 h-100" style="margin-top:-40px;${readOnly?"pointer-events:none":''}"></iframe>`
 
-const editor = html`<div class="absolute mb5 bottom-0 left-0 w-100 skewY overflow-hidden pa2" style="height:60%;transition: opacity 1s;">
+const editor = html`<div class="absolute top-0 left-0 w-100 h-100 pa2" style="transition: opacity 1s;">
   ${iframe}
 </div>`
 
@@ -54,28 +66,47 @@ window.addEventListener("message", function(event) {
       //  console.log('evaluate', event.data.args.body)
       editor.style.opacity = 1
       if(readOnly) setTimeout(() => editor.style.opacity = 1, 2000)
-      if (event.data.args.editorId == 1) {
-        agua.run(event.data.args.body)
-      } else {
-        eval(event.data.args.body)
-      }
+      // if (event.data.args.editorId == 1) {
+      //   agua.run(event.data.args.body)
+      // } else {
+        try {
+          eval(event.data.args.body)
+          logEl.innerHTML = ''
+        } catch (e) {
+          logEl.innerHTML = e.message
+          console.log('CAUGHT ERROR', e.message)
+        }
+    //  }
 
     } else if (event.data.cmd === "initialSync") {
       if(!hasSynced) {
         const editorText = event.data.args.editors
-        if(editorText[0]) eval(editorText[0])
-        if(editorText[1]) agua.run(editorText[1])
+        if(editorText[0]) {
+          try {
+            eval(editorText[0])
+            logEl.innerHTML = ''
+          } catch (e) {
+            logEl.innerHTML = e.message
+            console.log('CAUGHT ERROR', e.message)
+          }
+        }
+      //  if(editorText[1]) agua.run(editorText[1])
       }
     }
   }
 })
 
 function start() {
-  agua.load()
+//  agua.load()
+
   uiContainer.innerHTML = ''
   uiContainer.appendChild(editor)
+  uiContainer.appendChild(logEl)
+
   emitter.emit('start')
   initStreamingMedia({ emitter: emitter })
+  window.history.replaceState(null,'', `?session=${sessionId}${edit===null? '': `&edit=${edit}`}`);
+
 }
 document.body.appendChild(uiContainer)
 //  document.body.appendChild(editor)

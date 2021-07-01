@@ -19,6 +19,23 @@ module.exports = ({ emitter } = {}) => {
 
 
   const server = "wss://mediasoup.tentacles.live:8000"   // /?stream=flujos"
+
+  window.hydra.s.forEach((source) => {
+    source.initServerStream = (key = "test") =>  {
+            const video = document.createElement('video')
+          //  video.srcObject = stream
+            video.addEventListener('loadedmetadata', () => {
+              video.play().then(() => {
+                source.src = video
+                source.tex = source.regl.texture(source.src)
+              })
+            })
+
+            document.body.appendChild(video)
+      source.mediasoupViewer = new Viewer({ videoEl: video, server:  server, streamKey: key})
+    }
+
+  })
   //window.onclick = () => {
   //  if(!hasStarted) {
       const video = createVideo({}, () => {
@@ -53,6 +70,19 @@ module.exports = ({ emitter } = {}) => {
     return [video, video2]
   //}
 }
+
+function initServerStream (key) {
+  const video = createVideo({}, () => {
+    setTimeout(() => {
+      s0.init({ src: video })
+      // osc(3, 0.2, 1.2).diff(s0).out()
+      video.play()
+      emitter.emit('stream:loaded', 0, video)
+    }, 200)
+  })
+}
+
+
 
 function createVideo({ width=300, height=200} = {}, onload = () => {}) {
   const vid = html`<video style="width:${width};height:${height};clip-path:circle(${height/2}px at ${width/2}px ${height/2}px)"></video>`

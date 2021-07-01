@@ -1,4 +1,4 @@
-const PIXI = require('pixi.js')
+// const PIXI = require('pixi.js-legacy')
 const cursorImage = require('./../assets/mouse-arrow.png');
 
 const RemoteMouse = require('./lib/remoteMouse.js')
@@ -13,15 +13,24 @@ let mouseProps = {
 
 
 module.exports = ({ parent = document.body, emitter } = {}, state) => {
+  // const testCanvas = document.createElement('canvas')
+  // testCanvas.width = 1024
+  // testCanvas.height = 1024
   const app = new PIXI.Application({
     // backgroundColor: 0x1099bb
     width: window.innerWidth,
     height: window.innerHeight,
-    transparent: true
+    forceCanvas: true,
+    // width: 500,
+    // height: 500,
+    // transparent: true
   });
   parent.appendChild(app.view);
 
-  s2.init({ src: app.view })
+  console.log('view is', app.view)
+  window.pixi = app.view
+
+  setTimeout( () => s2.init({ src: app.view }), 1000)
   // app.view.style.zIndex = 100
   app.view.style.position = "absolute"
   app.view.style.pointerEvents = "none"

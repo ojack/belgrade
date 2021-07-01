@@ -21,10 +21,13 @@
     "last 3 safari versions"
   ],
   "dependencies": {
+    "@pixi/canvas-renderer": "^6.0.2",
     "events": "^3.3.0",
     "mediasoup-client": "^3.6.29",
     "nanohtml": "^1.9.1",
+    "nanoid": "^3.1.23",
     "pixi.js": "^5.3.9",
+    "pixi.js-legacy": "^5.2.x",
     "protoo-client": "^4.0.6"
   }
 }
